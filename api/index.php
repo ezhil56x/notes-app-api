@@ -1,56 +1,19 @@
 <?php
     error_reporting(E_ALL ^ E_DEPRECATED);
     require_once("REST.api.php");
+    require_once("lib/Database.class.php");
+    require_once("lib/Signup.class.php");
 
     class API extends REST {
 
         public $data = "";
-
-        private $DB_SERVER = "localhost";
-        private $DB_USER = "root";
-        private $DB_PASSWORD = "";
-        private $DB_NAME = "apis";
-
         private $db = NULL;
 
         public function __construct(){
-            parent::__construct();                  // Init parent contructor
-            //read database config from ../../env.json
-            /*
-            file env.json
-
-            {
-                "database": "apis",
-                "username": "root",
-                "password": "",
-                "server": "localhost"
-            }
-
-            */
-            $config_json = file_get_contents('../../env.json');
-            $config = json_decode($config_json, true);
-            $this->DB_SERVER = $config['server'];
-            $this->DB_USER = $config['username'];
-            $this->DB_PASSWORD = $config['password'];
-            $this->DB_NAME = $config['database'];
-            $this->dbConnect();                    // Initiate Database connection
+            parent::__construct();                // Init parent contructor
+            $this->db = Database::getConnection();     // Initiate Database connection
         }
 
-        /*
-           Database connection
-        */
-        private function dbConnect(){
-            if ($this->db != NULL) {
-				return $this->db;
-			} else {
-				$this->db = mysqli_connect($this->DB_SERVER,$this->DB_USER,$this->DB_PASSWORD, $this->DB_NAME);
-				if (!$this->db) {
-					die("Connection failed: ".mysqli_connect_error());
-				} else {
-					return $this->db;
-				}
-			}
-        }
 
         /*
          * Public method for access api.
@@ -127,6 +90,19 @@
         function generate_hash(){
             $bytes = random_bytes(16);
             return bin2hex($bytes);
+        }
+
+        private function gen_hash(){
+            if(isset($this->_request['pass'])){
+                $s = new Signup("", $this->_request['pass'], "");
+                $data = [
+                    "hash" => $s->hashPassword(),
+                    "val" => $this->_request['pass'],
+                    "verify" => password_verify($this->_request['pass'], $s->hashPassword())
+                ];
+                $data = $this->json($data);
+                $this->response($data,200);
+            }
         }
 
         /*************API SPACE END*********************/
