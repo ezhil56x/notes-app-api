@@ -1,4 +1,5 @@
 <?php
+    require_once($_SERVER['DOCUMENT_ROOT']."/api/lib/Database.class.php");
     class REST {
 
         public $_allow = array();
@@ -76,8 +77,8 @@
         private function inputs(){
             switch($this->get_request_method()){
                 case "POST":
-                    $this->_request = $this->cleanInputs($_POST);
-                    $this->_request = $this->cleanInputs(array_merge($_GET,$_POST));
+                    //$this->_request = $this->cleanInputs($_POST);
+                    $this->_request =  $this->cleanInputs(array_merge($_GET,$_POST));
                     break;
                 case "GET":
                     $this->_request = $this->cleanInputs($_GET);
@@ -103,6 +104,7 @@
             }else{
                 $data = trim(stripslashes($data));
                 $data = strip_tags($data);
+                $data = mysqli_real_escape_string(Database::getConnection(), $data);
                 $clean_input = trim($data);
             }
             return $clean_input;

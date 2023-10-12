@@ -12,4 +12,3 @@ RewriteRule ^(.+)\.php$ "http://%{HTTP_HOST}/$1" [R=404,L]
 # Resolve .php file for extensionless php urls
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^/.]+)$ $1.php [L]
-
