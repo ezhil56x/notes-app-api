@@ -23,22 +23,20 @@ class API extends REST {
     */
     public function processApi(){
         $func = strtolower(trim(str_replace("/","",$_REQUEST['rquest'])));
-        if((int)method_exists($this,$func) > 0)
+        if((int)method_exists($this,$func) > 0){
             $this->$func();
+        }
         else {
             if(isset($_GET['namespace'])){
                 $dir = $_SERVER['DOCUMENT_ROOT'].'/api/apis/'.$_GET['namespace'];
                 $methods = scandir($dir);
-                
-                // var_dump($methods);
-    
-                foreach ($methods as $m) {
-                    if($m == "." or $m == "..") {
+                //var_dump($methods);
+                foreach($methods as $m){
+                    if($m == "." or $m == ".."){
                         continue;
                     }
-                    
                     $basem = basename($m, '.php');
-                    // echo "Trying to call $basem() for $func()\n";
+                    //echo "Trying to call $basem() for $func()\n";
                     if($basem == $func){
                         include $dir."/".$m;
                         $this->current_call = Closure::bind(${$basem}, $this, get_class());
@@ -46,20 +44,18 @@ class API extends REST {
                     }
                 }
             } else {
-                // We can even process functions without namespace here
-                $this->response($this->json(['error'=>'method_not_found']), 404);
+                //we can even process functions without namespace here.
+                $this->response($this->json(['error'=>'methood_not_found']),404);
             }
         }
     }
 
-    public function __call($method, $args) {
+    public function __call($method, $args){
         if(is_callable($this->current_call)){
             return call_user_func_array($this->current_call, $args);
         } else {
-            $this->response($this->json(['error'=>'method_not_callable']), 404);
+            $this->response($this->json(['error'=>'methood_not_callable']),404);
         }
-
-
     }
     
     /*************API SPACE START*******************/
@@ -67,11 +63,11 @@ class API extends REST {
     private function about(){
         
         if($this->get_request_method() != "POST"){
-            $error = array('status' => 'WRONG_CALL', "msg" => "The type of call cannot be accepted by our servers.");
+            $error = array('method'=> $this->get_request_method(), 'status' => 'WRONG_CALL', "msg" => "The type of call cannot be accepted by our servers.");
             $error = $this->json($error);
             $this->response($error,406);
         }
-        $data = array('version' => $this->_request['version'], 'desc' => 'This API is created by Blovia Technologies Pvt. Ltd., for the public usage for accessing data about vehicles.');
+        $data = array('method'=> $this->get_request_method(),'version' => $this->_request['version'], 'desc' => 'This API is created by Blovia Technologies Pvt. Ltd., for the public usage for accessing data about vehicles.');
         $data = $this->json($data);
         $this->response($data,200);
         
@@ -87,7 +83,7 @@ class API extends REST {
         if(isset($this->_request['pass'])){
             $cost = (int)$this->_request['cost'];
             $options = [
-                'cost' => $cost,
+                "cost" => $cost
             ];
             $hash = password_hash($this->_request['pass'], PASSWORD_BCRYPT, $options);
             $data = [
@@ -115,12 +111,6 @@ class API extends REST {
             $this->response($data,200);
         }
     }
-
-
-    
-    
-    
-    
     /*************API SPACE END*********************/
     
     /*

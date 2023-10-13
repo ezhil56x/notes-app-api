@@ -4,6 +4,7 @@ RewriteBase /
 RewriteRule ^/?api/([^/]+)?$ api/index.php?rquest=$1 [L,QSA,NC]
 RewriteRule ^/?api/([^/]+)/([^/]+)?$ api/index.php?rquest=$2&namespace=$1 [L,QSA,NC]
 
+
 ## For general files, if not above, just remove .php
 
 # Redirect external .php requests to 404 Error (Pretending that I am not doing PHP)

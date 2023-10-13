@@ -80,7 +80,6 @@ class Signup {
         $result = mysqli_query($db, $query);
         if($result and mysqli_num_rows($result) == 1){
             $data = mysqli_fetch_assoc($result);
-            print($data);
             if($data['active'] == 1){
                 throw new Exception("Already Verified");
             }
