@@ -65,6 +65,7 @@ class API extends REST {
         }
     }
 
+
     public function auth(){
         $headers = getallheaders();
         if(isset($headers['Authorization'])){
