@@ -1,10 +1,10 @@
 ### API Development Course by LAHTP
 
-To get started, clone this repository to a proper document root. For XAMPP, this is `htdocs`. For private apache setup, its upto you how you configiure. 
+To get started, clone this repository to a proper document root. For XAMPP, this is `htdocs`. For private apache setup, its upto you how you configiure.
 
 This code is right now accessible at: https://api1.selfmade.ninja
 
-Right outside the document root, create a file called `env.json` and keep the contents of the file similar to the following. 
+Right outside the document root, create a file called `env.json` and keep the contents of the file similar to the following.
 
 ```
 {
@@ -16,7 +16,7 @@ Right outside the document root, create a file called `env.json` and keep the co
 }
 ```
 
-This will be called by the API functions to get the database connection. 
+This will be called by the API functions to get the database connection.
 
 This project is under development.
 
@@ -24,9 +24,9 @@ This project is under development.
 
 ```
 <VirtualHost *:80>
-    ServerAdmin hello@sibidharan.me       
+    ServerAdmin hello@sibidharan.me
     DocumentRoot "/var/www/api-development-course-apr-2021"
-    ServerName api1.selfmade.ninja 
+    ServerName api1.selfmade.ninja
 
         ErrorLog ${APACHE_LOG_DIR}/error.log
         CustomLog ${APACHE_LOG_DIR}/access.log combined
@@ -36,13 +36,7 @@ This project is under development.
             AllowOverride All
             Require all granted
     </Directory>
-
-# Added automatically by LetsEncrypt
-RewriteEngine on
-RewriteCond %{SERVER_NAME} =api1.selfmade.ninja
-RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=307]
 </VirtualHost>
-
 ```
 
 In the above configuration, `env.json` should sit exactly `/var/www/env.json` here.
@@ -50,7 +44,6 @@ In the above configuration, `env.json` should sit exactly `/var/www/env.json` he
 #### Configuring your own Ubuntu Setup
 
 Reference: https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-ubuntu-20-04
-
 
 1. Update and upgrade the system first.
 
@@ -72,7 +65,7 @@ $ sudo mysql_secure_installation
 
 and follow the onscreen steps. For more info, check the above link.
 
-4. Create a Database 
+4. Create a Database
 
 ```
 $ mysql -u root -p
@@ -115,5 +108,10 @@ $ cd /var
 $ sudo chown $(whoami):$(whoami) -R www
 ```
 
-Now update the `env.json` file with the user and database info created. All set, your code should be accessible at http://localhost
+6. Now import the database export locaked at `database/export.sql` into the database you just created and we have all the tables.
 
+Now update the `env.json` file with the user and database info created. All set, your code should be accessible at http://localhost or whereever you configured it to work.
+
+### Security
+
+All the data that you get with `$this->_request[]` inside the APIs are secured with `mysqli_real_escape_string` during the API initialization. Look for the function called REST::cleanInputs() inside `api/REST.api.php` and here is where it happens. So this development is considered secured from MySQLi injections. If you access `$_GET` or `$_POST` anywhere else directly without `$this->_request[]`, then you might just need to filter the inputs yourself and make them secure.
